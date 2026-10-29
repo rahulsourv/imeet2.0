@@ -1,0 +1,421 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-app-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-app-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-app-heading), ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-chalk: var(--chalk);
+
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  --animate-float-astronaut: float-astronaut 16s ease-in-out infinite;
+  --animate-float-ufo: float-ufo 7s ease-in-out infinite;
+  --animate-float-saturn: float-saturn 12s ease-in-out infinite;
+  --animate-bob: bob 6s ease-in-out infinite;
+  --animate-sway: sway 6.5s ease-in-out infinite;
+  --animate-turn-slow: turn 90s linear infinite;
+  --animate-orbit: turn 48s linear infinite;
+  --animate-orbit-reverse: turn-reverse 64s linear infinite;
+  --animate-blob-sway: blob-sway 18s ease-in-out infinite;
+}
+
+:root {
+  --background: #e8e7e2;
+  --foreground: #0f0f0e;
+  --chalk: #f7f6f2;
+  --card: #f1f0ec;
+  --muted-foreground: #54534e;
+  --border: #c9c8c1;
+  --ring: #0f0f0e;
+  --radius: 1rem;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+  ::selection {
+    background-color: var(--foreground);
+    color: var(--chalk);
+  }
+}
+
+@layer components {
+  .grain-overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    opacity: 0.6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.35 -0.08'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+
+  .bg-starfield {
+    background-image:
+      radial-gradient(1.2px 1.2px at 22px 34px, rgba(247, 246, 242, 0.9), transparent),
+      radial-gradient(1px 1px at 96px 128px, rgba(247, 246, 242, 0.7), transparent),
+      radial-gradient(1.6px 1.6px at 168px 62px, rgba(247, 246, 242, 0.85), transparent),
+      radial-gradient(1px 1px at 204px 196px, rgba(247, 246, 242, 0.6), transparent),
+      radial-gradient(1.3px 1.3px at 58px 212px, rgba(247, 246, 242, 0.75), transparent),
+      radial-gradient(1px 1px at 132px 18px, rgba(247, 246, 242, 0.5), transparent),
+      radial-gradient(1.4px 1.4px at 300px 240px, rgba(247, 246, 242, 0.8), transparent),
+      radial-gradient(1px 1px at 260px 120px, rgba(247, 246, 242, 0.55), transparent),
+      radial-gradient(1.8px 1.8px at 340px 40px, rgba(247, 246, 242, 0.9), transparent);
+    background-size: 230px 230px, 230px 230px, 230px 230px, 230px 230px, 230px 230px, 230px 230px, 370px 370px, 370px 370px, 370px 370px;
+  }
+
+  /* Chunky 3D extrusion for section titles. */
+  .text-extrude {
+    --extrude: var(--foreground);
+    --face: var(--chalk);
+    color: var(--face);
+    -webkit-text-stroke: 0.032em var(--extrude);
+    paint-order: stroke;
+    text-shadow:
+      -0.008em 0.008em 0 var(--extrude), -0.016em 0.016em 0 var(--extrude), -0.024em 0.024em 0 var(--extrude),
+      -0.032em 0.032em 0 var(--extrude), -0.04em 0.04em 0 var(--extrude), -0.048em 0.048em 0 var(--extrude),
+      -0.056em 0.056em 0 var(--extrude), -0.064em 0.064em 0 var(--extrude), -0.072em 0.072em 0 var(--extrude),
+      -0.08em 0.08em 0 var(--extrude);
+  }
+  .text-extrude-inverse {
+    --extrude: var(--chalk);
+    --face: var(--foreground);
+  }
+
+  /* Hero title letters: an extruded back copy whose depth follows the mouse, and a flat face on top. */
+  .glyph {
+    position: relative;
+    display: inline-block;
+  }
+  .glyph-back,
+  .glyph-front {
+    display: block;
+    transform-origin: 50% 80%;
+    transition: transform 0.6s var(--ease-spring);
+  }
+  .glyph-back {
+    --gx: calc(var(--ex, -1) * 0.0072em);
+    --gy: calc(var(--ey, 1) * 0.0072em);
+    position: relative;
+    z-index: 0;
+    color: var(--foreground);
+    -webkit-text-stroke: 0.034em var(--foreground);
+    text-shadow:
+      var(--gx) var(--gy) 0 var(--foreground), calc(var(--gx) * 2) calc(var(--gy) * 2) 0 var(--foreground),
+      calc(var(--gx) * 3) calc(var(--gy) * 3) 0 var(--foreground), calc(var(--gx) * 4) calc(var(--gy) * 4) 0 var(--foreground),
+      calc(var(--gx) * 5) calc(var(--gy) * 5) 0 var(--foreground), calc(var(--gx) * 6) calc(var(--gy) * 6) 0 var(--foreground),
+      calc(var(--gx) * 7) calc(var(--gy) * 7) 0 var(--foreground), calc(var(--gx) * 8) calc(var(--gy) * 8) 0 var(--foreground),
+      calc(var(--gx) * 9) calc(var(--gy) * 9) 0 var(--foreground), calc(var(--gx) * 10) calc(var(--gy) * 10) 0 var(--foreground),
+      calc(var(--gx) * 11) calc(var(--gy) * 11) 0 var(--foreground), calc(var(--gx) * 12) calc(var(--gy) * 12) 0 var(--foreground);
+    animation: glyph-drop 1.1s var(--ease-spring) backwards, extrude-grow 0.9s var(--ease-out-expo) backwards;
+    animation-delay: calc(var(--i, 0) * 55ms + 0.3s), calc(var(--i, 0) * 55ms + 0.85s);
+  }
+  .glyph-front {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    color: var(--chalk);
+    -webkit-text-stroke: 0.034em var(--foreground);
+    paint-order: stroke;
+    animation: glyph-drop 1.1s var(--ease-spring) backwards;
+    animation-delay: calc(var(--i, 0) * 55ms + 0.3s);
+  }
+  .glyph:hover .glyph-back,
+  .glyph:hover .glyph-front {
+    transform: translateY(-0.08em) rotate(-5deg);
+  }
+
+  .hero-stage {
+    --u: min(1vw, 1.6vh);
+  }
+  @supports (height: 1svh) {
+    .hero-stage {
+      --u: min(1vw, 1.6svh);
+    }
+  }
+  /* Each hero layer drifts against the mouse by its depth and rises/spins with scroll. */
+  .hero-layer {
+    position: absolute;
+    will-change: transform;
+    transform: translate3d(
+        calc(var(--mx, 0) * var(--depth, 0) * -1px),
+        calc(var(--my, 0) * var(--depth, 0) * -1px - var(--sy, 0) * var(--rise, 0) * 1vh),
+        0
+      )
+      rotate(calc(var(--sy, 0) * var(--spin, 0) * 1deg));
+  }
+
+  .enter-rise {
+    animation: rise-in 1.2s var(--ease-out-expo) backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  .enter-left {
+    animation: drift-in-left 1.7s var(--ease-out-expo) backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  .enter-right {
+    animation: drift-in-right 1.9s var(--ease-out-expo) backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  .enter-up {
+    animation: drift-in-up 1.6s var(--ease-out-expo) backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  .enter-pop {
+    animation: pop-in 1.4s var(--ease-spring) backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  .enter-fade {
+    animation: fade-in-soft 1.4s ease-out backwards;
+    animation-delay: var(--delay, 0s);
+  }
+  .twinkle {
+    animation: twinkle 3.4s ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  .shooting-star {
+    position: absolute;
+    height: 2px;
+    border-radius: 999px;
+    opacity: 0;
+    transform-origin: 0;
+    background-image: linear-gradient(90deg, transparent, currentColor);
+    animation: shoot var(--duration, 9s) ease-in infinite;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(2.25rem);
+    transition: opacity 0.9s var(--ease-out-expo), transform 1.1s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  .quote-enter {
+    animation: quote-in 0.8s var(--ease-out-expo) both;
+  }
+  .quote-exit {
+    animation: quote-out 0.5s var(--ease-out-expo) both;
+  }
+  .quote-progress {
+    transform-origin: 0;
+    animation: progress var(--duration, 7s) linear both;
+  }
+  .quote-progress[data-paused="true"] {
+    animation-play-state: paused;
+  }
+
+  .flip-card {
+    perspective: 1400px;
+  }
+  .flip-card-inner {
+    position: relative;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.9s var(--ease-spring);
+  }
+  .flip-card[aria-pressed="true"] .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+  }
+  .flip-face-back {
+    transform: rotateY(180deg);
+  }
+
+  .guide summary {
+    list-style: none;
+  }
+  .guide summary::-webkit-details-marker {
+    display: none;
+  }
+  .guide[open] .guide-body {
+    animation: rise-in 0.6s var(--ease-out-expo) backwards;
+  }
+  .guide[open] .guide-icon {
+    transform: rotate(45deg);
+  }
+
+  .constellation-line {
+    stroke-dasharray: var(--len, 100);
+    stroke-dashoffset: var(--len, 100);
+  }
+  .is-visible .constellation-line {
+    animation: draw 2.4s var(--ease-out-expo) forwards;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .menu-item {
+    animation: menu-in 0.7s var(--ease-out-expo) backwards;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    transition: background-size 0.45s var(--ease-out-expo);
+  }
+  .link-underline:hover,
+  a:hover > .link-underline,
+  .link-underline[data-active="true"] {
+    background-size: 100% 1.5px;
+  }
+
+  /* The few tw-animate-css entrance utilities the page uses. */
+  .animate-in {
+    animation: enter var(--tw-duration, 0.15s) ease both;
+  }
+  .fade-in {
+    --tw-enter-opacity: 0;
+  }
+  .slide-in-from-bottom-3 {
+    --tw-enter-translate-y: 0.75rem;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(0, var(--tw-enter-translate-y, 0), 0);
+  }
+}
+@keyframes turn {
+  100% { transform: rotate(360deg); }
+}
+@keyframes turn-reverse {
+  100% { transform: rotate(-360deg); }
+}
+@keyframes float-astronaut {
+  0%, 100% { transform: translate(0) rotate(0deg); }
+  25% { transform: translate(-2%, -3%) rotate(-4deg); }
+  50% { transform: translate(1%, -6%) rotate(2deg); }
+  75% { transform: translate(2.5%, -2%) rotate(5deg); }
+}
+@keyframes float-ufo {
+  0%, 100% { transform: translate(0) rotate(-3deg); }
+  50% { transform: translateY(-7%) rotate(3deg); }
+}
+@keyframes float-saturn {
+  0%, 100% { transform: translate(0) rotate(0deg); }
+  50% { transform: translate(-1.5%, -5%) rotate(-5deg); }
+}
+@keyframes bob {
+  0%, 100% { transform: translate(0); }
+  50% { transform: translateY(-10%); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2.5deg); }
+}
+@keyframes blob-sway {
+  0%, 100% { transform: rotate(-4deg) scale(1); }
+  50% { transform: rotate(5deg) scale(1.04); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.55) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(90deg); }
+}
+@keyframes shoot {
+  0% { opacity: 0; transform: rotate(var(--angle, 32deg)) translate3d(-120%, 0, 0) scaleX(0.3); }
+  3% { opacity: 1; }
+  11% { opacity: 0; transform: rotate(var(--angle, 32deg)) translate3d(260%, 0, 0) scaleX(1); }
+  100% { opacity: 0; transform: rotate(var(--angle, 32deg)) translate3d(260%, 0, 0) scaleX(1); }
+}
+@keyframes marquee {
+  100% { transform: translate(-50%); }
+}
+@keyframes glyph-drop {
+  0% { opacity: 0; transform: translateY(-0.9em) rotate(-14deg) scale(0.92); }
+}
+@keyframes extrude-grow {
+  0% { text-shadow: none; }
+}
+@keyframes rise-in {
+  0% { opacity: 0; transform: translateY(2.5rem); }
+}
+@keyframes drift-in-left {
+  0% { opacity: 0; transform: translate(-24vw, 6vh) rotate(-20deg); }
+}
+@keyframes drift-in-right {
+  0% { opacity: 0; transform: translate(26vw, 10vh) rotate(28deg); }
+}
+@keyframes drift-in-up {
+  0% { opacity: 0; transform: translateY(30vh); }
+}
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.35) rotate(-24deg); }
+}
+@keyframes fade-in-soft {
+  0% { opacity: 0; }
+}
+@keyframes quote-in {
+  0% { opacity: 0; filter: blur(6px); transform: translate(2.5rem); }
+}
+@keyframes quote-out {
+  100% { opacity: 0; filter: blur(6px); transform: translate(-2.5rem); }
+}
+@keyframes progress {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+@keyframes draw {
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes menu-in {
+  0% { opacity: 0; transform: translateY(1.5rem) rotate(-2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+  }
+}
